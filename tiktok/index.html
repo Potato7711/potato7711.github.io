@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<title>TikTok sign-in · Clipper</title>
+<style>
+  :root { --bg:#faf8f5; --fg:#211813; --muted:#6d6159; --line:#e7e1da; --accent:#a9480a; --box:#ffffff; --bad:#b42318; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#16120f; --fg:#f3ede7; --muted:#b3a79e; --line:#3a312b; --accent:#f08a4b; --box:#211b17; --bad:#f97066; } }
+  body { margin:0; background:var(--bg); color:var(--fg); font:17px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width:680px; margin:0 auto; padding:56px 16px; }
+  h1 { font-size:28px; margin:0 0 8px; }
+  p { color:var(--muted); }
+  textarea { box-sizing:border-box; width:100%; min-height:110px; padding:12px; border:1px solid var(--line); border-radius:10px;
+             background:var(--box); color:var(--fg); font:14px/1.5 ui-monospace, Consolas, monospace; resize:vertical; word-break:break-all; }
+  button { margin-top:12px; padding:10px 18px; border:0; border-radius:10px; background:var(--accent); color:#fff; font:600 16px system-ui, sans-serif; cursor:pointer; }
+  .bad { color:var(--bad); }
+</style>
+</head>
+<body>
+<main>
+  <h1 id="head">Almost done</h1>
+  <p id="say">Copy this whole address, then paste it into Clipper: <b>Settings → Connected apps → Finish connecting TikTok</b>.
+     It works for 15 minutes.</p>
+  <textarea id="addr" readonly aria-label="This page's address"></textarea>
+  <button id="copy" type="button">Copy address</button>
+  <p id="done" hidden>Copied. Now paste it into Clipper.</p>
+</main>
+<script>
+  // Shows this page's own address so it can be copied into Clipper. Nothing is sent anywhere.
+  const addr = document.getElementById("addr");
+  addr.value = location.href;
+  const q = new URLSearchParams(location.search);
+  if (q.get("error") || !q.get("code")) {
+    document.getElementById("head").textContent = "TikTok did not finish signing in";
+    const say = document.getElementById("say");
+    say.className = "bad";
+    say.textContent = q.get("error_description") || q.get("error") || "There is no sign-in code in this address. Start again from Clipper.";
+  }
+  document.getElementById("copy").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(addr.value); } catch (e) { addr.select(); document.execCommand("copy"); }
+    document.getElementById("done").hidden = false;
+  });
+</script>
+</body>
+</html>
